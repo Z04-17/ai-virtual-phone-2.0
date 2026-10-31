@@ -8244,6 +8244,27 @@ export function ChatRoom({ session, onBack, onDeleted, lyricQuote, onLyricQuoteC
                 ) : null
             )}
 
+            {/* Voice Call overlay: covers chat room in fullscreen, or floats as a pill when minimized */}
+            {showVoiceCall && (
+                session.isGroup && groupCharacters.length > 0 ? (
+                    <GroupCallScreen
+                        type="voice"
+                        session={session}
+                        characters={groupCharacters}
+                        initiator={callInitiator}
+                        initiatorName={callInitiatorName}
+                        onEnd={() => returnFromCall(() => setShowVoiceCall(false))}
+                    />
+                ) : character ? (
+                    <VoiceCallScreen
+                        session={session}
+                        character={character}
+                        initiator={callInitiator}
+                        onEnd={() => returnFromCall(() => setShowVoiceCall(false))}
+                    />
+                ) : null
+            )}
+
             {/* Chat toast notification (overlay, does not affect layout) */}
             {chatToast && (
                 <div className="chat-toast-overlay">
