@@ -6587,7 +6587,8 @@ export function ChatRoom({ session, onBack, onDeleted, lyricQuote, onLyricQuoteC
     const editingMessage = editingMessageId ? messages.find(m => m.id === editingMessageId) : null;
     const editingSystemInstruction = editingMessage ? isSystemInstructionMessage(editingMessage) : false;
 
-    if (showVoiceCall) {
+    // Note: showVoiceCall moved to inside the chat room render tree as an overlay layer so ChatRoom remains fully visible and active behind the floating call pill.
+    if (false && showVoiceCall) {
         if (session.isGroup && groupCharacters.length > 0) {
             return (
                 <GroupCallScreen
@@ -8199,6 +8200,27 @@ export function ChatRoom({ session, onBack, onDeleted, lyricQuote, onLyricQuoteC
                     message={imageGenerationFailure}
                     onClose={() => setImageGenerationFailure(null)}
                 />
+            )}
+
+            {/* Voice Call overlay: covers chat room in fullscreen, or floats as a pill when minimized */}
+            {showVoiceCall && (
+                session.isGroup && groupCharacters.length > 0 ? (
+                    <GroupCallScreen
+                        type="voice"
+                        session={session}
+                        characters={groupCharacters}
+                        initiator={callInitiator}
+                        initiatorName={callInitiatorName}
+                        onEnd={() => returnFromCall(() => setShowVoiceCall(false))}
+                    />
+                ) : character ? (
+                    <VoiceCallScreen
+                        session={session}
+                        character={character}
+                        initiator={callInitiator}
+                        onEnd={() => returnFromCall(() => setShowVoiceCall(false))}
+                    />
+                ) : null
             )}
 
             {/* Chat toast notification (overlay, does not affect layout) */}

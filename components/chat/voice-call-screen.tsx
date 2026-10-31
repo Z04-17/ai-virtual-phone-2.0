@@ -2,6 +2,7 @@
 import { voiceDisplayText, voiceSpeechText } from "@/lib/voice-expression";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { ChatSession, ChatMessage, loadChatMessages, pushChatMessage, getLatestCharacterStateValues } from "@/lib/chat-storage";
 import type { StateValue } from "@/lib/chat-storage";
 import { parseStateValues, mergeStateValues } from "@/lib/state-value-parser";
@@ -625,11 +626,18 @@ export function VoiceCallScreen({ session, character, onEnd, onConnect, initiato
 
     // ── Render ──────────────────────────────────────
     if (isMinimized && callState !== "ENDED") {
-        return (
+        const portalTarget = typeof document !== "undefined"
+            ? (document.querySelector("[data-ui='phone-screen']") || document.body)
+            : null;
+        const pillNode = (
             <div
-                className="fixed bottom-[96px] right-[16px] z-[9999] flex items-center gap-2 p-2 rounded-full shadow-2xl backdrop-blur-xl border border-white/20 select-none animate-in fade-in zoom-in-90 duration-200 cursor-pointer"
+                className="fixed bottom-[96px] right-[16px] z-[9999] flex items-center gap-2 p-2 rounded-full shadow-2xl backdrop-blur-xl border border-white/20 select-none animate-in fade-in zoom-in-90 duration-200 cursor-pointer pointer-events-auto"
                 style={{ background: "rgba(22, 22, 26, 0.88)", color: "#fff" }}
-                onClick={() => setIsMinimized(false)}
+                onClick={() => {
+                    setIsMinimized(false);
+                    // 确保切回该会话全屏
+                    window.dispatchEvent(new CustomEvent("chat-open-session", { detail: { sessionId: session.id } }));
+                }}
             >
                 <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-white/30">
                     {character.avatar ? (
@@ -660,6 +668,7 @@ export function VoiceCallScreen({ session, character, onEnd, onConnect, initiato
                 </button>
             </div>
         );
+        return portalTarget ? createPortal(pillNode, portalTarget) : pillNode;
     }
 
     return (
