@@ -87,12 +87,6 @@ export function VoiceCallScreen({ session, character, onEnd, onConnect, initiato
     const pendingQueueRef = useRef<string[]>([]);
     const idleSilenceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isProactiveTurnRef = useRef(false);
-    const [pendingQueue, setPendingQueue] = useState<string[]>([]);
-    const [isMinimized, setIsMinimized] = useState(false);
-
-    const pendingQueueRef = useRef<string[]>([]);
-    const idleSilenceTimerRef = useRef<NodeJS.Timeout | null>(null);
-    const isProactiveTurnRef = useRef(false);
 
     const sttRef = useRef<STTSession | null>(null);
     const audioAbortRef = useRef<(() => void) | null>(null);
